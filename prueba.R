@@ -31,3 +31,6 @@ lineas_Haiti <- ggplot(data = pob_tot_Haiti, aes(x = Year, y = Pob_Total)) +
     plot.background = element_rect(fill = "white", color = NA)
   )  
 ggplotly(lineas_Haiti)
+
+
+#buenas tardes hola hola
