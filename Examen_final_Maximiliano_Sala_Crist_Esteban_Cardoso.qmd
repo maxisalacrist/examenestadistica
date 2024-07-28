@@ -1,0 +1,95 @@
+------------------------------------------------------------------------
+
+title: "Exámen Estadística I" author: "Maximiliano Sala Crist ci 4857436-4, Esteban Cardoso ci 4742670-6" linestretch: "1.5" format: pdf: toc: true number-sections: true fig_caption: yes keep_tex: true editor: visual lang: "es" ---
+
+```{r include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(lmtest)
+library(MASS)
+options(scipen = 999)
+```
+
+```{r}
+df <- read.csv('NoComunicables.csv')[,c(2:17)]
+```
+
+\newpage
+
+# Introducción
+
+El presente documento pretende esbozar a través del análisis de un modelo de regresión lineal múltiple, cuáles son aquellas variables independientes x que mejor explican nuestra variable dependiente y, considerada en este documento como la tasa de enfermedades no transmisibles, entendidas como el "...*grupo de enfermedades que no son causadas principalmente por una infección aguda, dan como resultado consecuencias para la salud a largo plazo y con frecuencia crean una necesidad de tratamiento y cuidados a largo plazo*." Este grupo comprende enfermedades cardiovasculares, tipos de cáncer, diabetes y enfermedades pulmonares crónicas. Para ello, analizamos un dataset con las tasas de las muertes por enfermedades no transmisibles de cada país y un conjunto de variables asociadas a la misma que podrían explicarla.
+
+# Selección de variables y planteamiento de hipótesis
+
+Para poder llevar adelante nuestro análisis partimos de la selección de tres variables independientes x que consideramos claves en la explicación de nuestra variable dependiente y. Recordar que en la explicación del modelo de regresión lineal múltiple es clave comprender que se estará trabajando bajo el supuesto de ceteris paribus.
+
+Las hipótesis que se intentan probar toman un modelo con tres factores:
+
+**H0​**: No hay relación significativa entre las variables independientes personas con enfermedades renales, personas que trabajan en entornos de riesgos ocupacionales y personas con presión alta, con nuestra variable dependiente tasa de enfermedades no transmisibles.  De modo que se cumple:
+
+𝜷0 + 𝜷1Kidney_dysfunction + 𝜷2Occupational_risks + 𝜷3High_pressure = 0
+
+**H1**: Al menos una de nuestras variables independientes tiene un efecto significativo en nuestra variable dependiente. De modo que se cumple:
+
+Existe por lo menos un i tal que 𝜷i ≠​ 0
+
+```{r}
+# Seleccione hasta tres variables que usted crea que pueden modelar a la variable de respuesta
+
+df_3var <- df %>% dplyr::select(NoComunicables, High_pressure, Occupational_risks, Kidney_dysfunction)
+```
+
+1 - Tres variables seleccionadas: Personas con enfermedades renales, Personas que trabajan en entornos de riesgos ocupacionales y Personas con presión alta.
+
+```{r}
+# ¿Cuáles son las correlaciones de estas variables con la variable de respuesta? ¿Es razonable hacer este modelo?, en caso contrario, cambie las variables explicativas.
+
+cor(df_3var)
+```
+
+2 - Correlación de 0.945, nos encontramos ante una correlación positiva y fuerte.
+
+3 - 0.945, da la pauta de que un 94.5% de las enfermedades no transmisibles son explicadas por personas que tienen enfermedades renales, presión alta y trabajan en lugares de riesgo.
+
+4 - Modelo teórico = No transmisibles = 𝜷0 + 𝜷1Kidney_dysfunction + 𝜷2Occupational_risks + 𝜷3High_pressure + 𝛆
+
+Modelo estimado = No transmisibles = 53.41923 + 3.50669Kidney_dysfunction + 14.95202Occupational_risks + 1.45480High_pressure
+
+# Explique como afectan las variables explicativas a la variable a explicar.
+
+# Indique el modelo estimado
+
+```{r}
+# ¿El modelo es significativo?¿Las variables son significativas? ¿Cómo se intrepreta cada parámetro?
+
+# ¿Cuánto de la variable de interés explica el modelo?
+
+modelo<-lm(NoComunicables ~ High_pressure + Occupational_risks + Kidney_dysfunction, data=df_3var)
+summary(modelo)
+```
+
+El modelo explica un de la variable de interés.
+
+```{r}
+# ¿Se cumplen los supuestos de los residuos (errores)?
+
+#Normalidad
+qqnorm(modelo$residuals)
+qqline(modelo$residuals, col = "red")
+shapiro.test(modelo$residuals)
+
+#Homocedasticidad
+bptest(modelo)
+```
+
+```{r}
+# Si aplicamos una estrategia de selección automática de variables, ¿Cómo queda el modelo estimado? (Recuerde cargar la librería MASS)
+
+
+```
+
+```{r}
+#Independencia de los residuos
+# dwtest(modelo)
+```
